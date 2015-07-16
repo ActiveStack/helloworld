@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.percero.apps</groupId>
+		<artifactId>pom-parent</artifactId>
+		<version>1.0.4</version>
+	</parent>
+
+	<groupId>io.activestack.example</groupId>
+	<artifactId>helloworld_worker</artifactId>
+	<version>0.0.1</version>
+
+
+	<name>Hello World Worker</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.percero.agent</groupId>
+			<artifactId>AgentListener</artifactId>
+			<version>1.1.0.14</version>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>activestack-releases</id>
+			<url>http://repository.spardev.com/sparrowdev/libs-releases-local/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.dstovall</groupId>
+				<artifactId>onejar-maven-plugin</artifactId>
+				<version>1.4.4</version>
+				<executions>
+					<execution>
+						<configuration>
+							<mainClass>io.activestack.helloworld.Main</mainClass>
+							<attachToBuild>true</attachToBuild>
+						</configuration>
+						<goals>
+							<goal>one-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>onejar-maven-plugin.googlecode.com</id>
+			<url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
+		</pluginRepository>
+	</pluginRepositories>
+</project>
