@@ -183,7 +183,7 @@ angular.module('Percero.Api', ['Percero.Model','Percero.Client','Percero.Config'
                 var deferred = autoLoginDeferred = Q.defer();
 
                 autoLoginTimeout = setTimeout(function(){
-                    if(loginDeferred) {
+                    if(autoLoginDeferred) {
                         autoLoginDeferred.reject(new Error("Login Timed Out"));
                         autoLoginDeferred = null;
                         autoLoginUT = null;
