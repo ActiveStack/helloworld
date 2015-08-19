@@ -17,8 +17,125 @@ angular.module('Percero.Api', ['Percero.Model','Percero.Client','Percero.Config'
             // Need to inject the API service into the domain classes because they use it directly
             PerceroDomain.init(this);
 
+            this.authenticateFromCookie = function(){
+                var deferred = autoLoginDeferred = Q.defer();
 
-            this.authenticate = function(providerId){
+                autoLoginTimeout = setTimeout(function(){
+                    if(autoLoginDeferred) {
+                        autoLoginDeferred.reject(new Error("Login Timed Out"));
+                        autoLoginDeferred = null;
+                        autoLoginUT = null;
+                        autoLoginTimeout = null;
+                    }
+                },45000);
+
+                userToken = this.getCookie('userToken');
+                // if we have a userToken and it is valid
+                if(userToken && userToken.clientId && userToken.token && userToken.user && userToken.user.ID){
+                    // This will create connect to the server, and when it has established the connection will call our callback
+                    // Which will try to autologin
+                    deferred.notify(1);
+                    self.connect()
+                        .then(function(){
+                            deferred.notify(2);
+                            var request = {};
+                            request.cn = "com.percero.agents.auth.vo.ReauthenticationRequest";
+                            request.regAppKey = "";
+                            request.clientId = userToken.clientId;
+                            request.token = userToken.token;
+                            request.userId = userToken.user.ID;
+                            request.deviceId = userToken.deviceId;
+
+                            console.log("Request")
+                            console.log(request);
+                            client.sendRequest("reauthenticate", request, function(message){
+                                console.log(message);
+                                autoLoginUT = message.result;
+                                deferred.notify(3);
+
+//                        deferred.resolve(message.result);
+                            });
+                        }, function(err){
+                            deferred.reject(err);
+                        });
+                }
+                else{
+                    deferred.reject(new Error("No userToken cookie found"));
+                }
+
+                return deferred.promise;
+            };
+
+            this.authenticateAnonymously = function(){
+                var deferred = Q.defer();
+
+                this.connect()
+                    .then(function () {
+                        $log.info("Client connected");
+                        self.loginAnonymously()
+                            .then(
+                            function (success) {
+                                deferred.resolve(success);
+                            },
+                            function (error) {
+                                deferred.reject(error);
+                            });
+                    }, function (error) {
+                        deferred.reject(error);
+                    });
+
+                return deferred.promise;
+            };
+
+            this.loginAnonymously = function(){
+                console.log("LoginAnonymously called");
+                var deferred = loginDeferred = Q.defer();
+                loginTimeout = setTimeout(function(){
+                    if(loginDeferred) {
+                        loginDeferred.reject(new Error("Login Timed Out"));
+                        loginDeferred = null;
+                        loginUT = null;
+                        loginTimeout = null;
+                    }
+                },45000);
+                var request = {};
+                request.cn = "com.percero.agents.auth.vo.AuthenticationRequest";
+                request.deviceId = deviceId;
+                request.authProvider = 'anonymous';
+                $log.info('Senging AuthenticationRequest');
+                client.sendRequest("authenticate", request, function(message) {
+                    console.log("Got authenticate response");
+                    if(deferred) {
+                        deferred.notify(1);
+                    }
+
+                    // Store the userToken in the cookie for later
+                    $log.info('authenticateOAuthCode message:');
+                    $log.info(message);
+                    if(message.result) {
+                        userToken = message.result;
+
+                        $log.info('Saving userToken as cookie');
+                        self.setCookie('userToken', userToken);
+                        /**
+                         * TODO: This only seems to break things? Is this really needed?
+                         */
+                        client.setCommonParams({token: message.result.token,
+                            userId: message.result.user.ID,
+                            deviceId: message.result.deviceId,
+                            sendAck: true});
+
+
+                        loginUT = userToken;
+                    }
+                    else
+                        deferred.resolve(false);
+                });
+
+                return deferred.promise;
+            };
+
+            this.authenticateWithOAuth = function(providerId){
                 var deferred = Q.defer();
                 var progress = 0;
                 var stateId = Math.random() * 1000000 + ""; // Required by some OAuth providers to be included in the original request.
