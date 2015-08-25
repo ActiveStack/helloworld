@@ -191,7 +191,7 @@ angular.module('HelloWorld.Domain.User',
 
         }
         ,doLoad: function(){
-            if (this.isShell && !this.isLoading) {
+            if (this.isShell && !this.isLoading && this.ID) {
                 this.isLoading = true;
                 var that = this;
                 this.api.findById(this.cn, this.ID, function() {

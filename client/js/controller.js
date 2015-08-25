@@ -6,7 +6,7 @@ app.controller('HelloWorldCtrl', function ($scope, percero) {
     $scope.authenticated = false;
     $scope.percero = percero;
 
-    $scope.login = function(){
+    $scope.anonLogin = function(){
         percero.api.authenticateAnonymously()
             .then(
             onLoginComplete,
@@ -20,6 +20,19 @@ app.controller('HelloWorldCtrl', function ($scope, percero) {
 
     $scope.cookieLogin = function(){
         percero.api.authenticateFromCookie()
+            .then(
+            onLoginComplete,
+            function(error){
+                console.log(error);
+            },
+            function(progress) {
+                console.log(progress);
+            });
+
+    };
+
+    $scope.googleLogin = function(){
+        percero.api.authenticateWithOAuth('google')
             .then(
             onLoginComplete,
             function(error){
@@ -49,12 +62,13 @@ app.controller('HelloWorldCtrl', function ($scope, percero) {
             var example = new percero.domain.User();
             example.userId = userToken.user.ID;
             percero.api.findByExample(example, function(message) {
-                var user = message.result[0];
-                $scope.$apply(function(){
-                    // This also gets hit when the server sends down a person object
-                    $scope.user = user;
-                    console.log(user);
-                });
+                console.log(message);
+                $scope.user = message.result[0];
+                //$scope.$apply(function(){
+                //    // This also gets hit when the server sends down a person object
+                //    $scope.user = user;
+                //    console.log(user);
+                //});
             });
         }
     }

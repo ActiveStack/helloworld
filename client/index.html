@@ -11,8 +11,9 @@
 <body>
 
 <div ng-controller="HelloWorldCtrl">
-    <button ng-if="!authenticated" ng-click="login()">Anon Login</button>
+    <button ng-if="!authenticated" ng-click="anonLogin()">Anon Login</button>
     <button ng-if="!authenticated" ng-click="cookieLogin()">Cookie Login</button>
+    <button ng-if="!authenticated" ng-click="googleLogin()">Google Login</button>
     <div ng-if="authenticated">
         <p>User: {{ user.firstName }} {{ user.lastName }}</p>
         <button ng-click="addBlock()">Add Block</button>

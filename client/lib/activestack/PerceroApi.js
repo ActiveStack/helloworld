@@ -142,21 +142,13 @@ angular.module('Percero.Api', ['Percero.Model','Percero.Client','Percero.Config'
 
                 var oauthProvider = undefined;
 
-                // If providerId is not defined or doesn't exist, attempt to find default.
-                if (!providerId || !PerceroConfig.oauthProviders.hasOwnProperty(providerId)) {
-                    providerId = PerceroConfig.oauthProvider;
-                }
-
                 // Get the selected oauthProvider, if it exists.  If it does NOT exist then
                 //  attempt to grab the default values for oauth.
                 if (providerId && PerceroConfig.oauthProviders.hasOwnProperty(providerId)) {
                     oauthProvider = PerceroConfig.oauthProviders[providerId];
                 }
                 else {
-                    oauthProvider = {
-                        appKey:  PerceroConfig.appKey,
-                        redirectUri: PerceroConfig.redirectUri
-                    }
+                    throw new Error('OAuth provider: '+providerId+' not configured');
                 }
 
                 $log.debug('OAuth Provider: ' + providerId);
@@ -210,7 +202,7 @@ angular.module('Percero.Api', ['Percero.Model','Percero.Client','Percero.Config'
                             self.connect()
                                 .then(function () {
                                     deferred.notify(++progress);
-                                    self.login()
+                                    self.loginOAuth()
                                         .then(
                                         function (success) {
                                             deferred.resolve(success);
@@ -240,7 +232,7 @@ angular.module('Percero.Api', ['Percero.Model','Percero.Client','Percero.Config'
             var loginDeferred = null;
             var loginUT = null;
             var loginTimeout = null;
-            this.login = function() {
+            this.loginOAuth = function() {
                 var deferred = loginDeferred = Q.defer();
                 loginTimeout = setTimeout(function(){
                     if(loginDeferred) {
@@ -251,16 +243,16 @@ angular.module('Percero.Api', ['Percero.Model','Percero.Client','Percero.Config'
                     }
                 },45000);
                 var request = {};
-                request.cn = "com.percero.agents.auth.vo.AuthenticateOAuthCodeRequest";
+                request.cn = "com.percero.agents.auth.vo.AuthenticationRequest";
                 request.regAppKey = "";
-                request.code = oauthCode;
-                request.redirectUri = this.currentOauthProvider.redirectUri;
+                request.credential = JSON.stringify({
+                    code: oauthCode,
+                    redirectUrl: this.currentOauthProvider.redirectUri
+                    });
                 request.deviceId = deviceId;
-                request.requestToken = "";
-                request.requestSecret = "";
-                request.authProvider = this.currentOauthProviderId.toUpperCase();
+                request.authProvider = this.currentOauthProviderId;
                 $log.info('Senging authenticateOAuthCode request');
-                client.sendRequest("authenticateOAuthCode", request, function(message) {
+                client.sendRequest("authenticate", request, function(message) {
                     if(deferred) {
                         deferred.notify(1);
                     }
@@ -268,9 +260,8 @@ angular.module('Percero.Api', ['Percero.Model','Percero.Client','Percero.Config'
                     // Store the userToken in the cookie for later
                     $log.info('authenticateOAuthCode message:');
                     $log.info(message);
-                    if(message.result && message.accessToken) {
+                    if(message.result) {
                         userToken = message.result;
-                        userToken.accessToken = message.accessToken;
                         $log.info('Saving userToken as cookie');
                         self.setCookie('userToken', userToken);
                         /**
@@ -281,10 +272,7 @@ angular.module('Percero.Api', ['Percero.Model','Percero.Client','Percero.Config'
                             deviceId: message.result.deviceId,
                             sendAck: true});
 
-
-//                deferred.resolve(userToken);
                         loginUT = userToken;
-//                        deferred.resolve(false);
                     }
                     else
                         deferred.resolve(false);
