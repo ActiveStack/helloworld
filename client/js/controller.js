@@ -32,7 +32,21 @@ app.controller('HelloWorldCtrl', function ($scope, percero) {
     };
 
     $scope.googleLogin = function(){
-        percero.api.authenticateWithOAuth('google')
+        percero.api.authenticateWithOAuth('googleoauth')
+            .then(
+            onLoginComplete,
+            function(error){
+                console.log(error);
+            },
+            function(progress) {
+                console.log(progress);
+            });
+
+    };
+
+    $scope.creds = {}
+    $scope.userPassLogin = function(){
+        percero.api.authenticateWithUserPass($scope.creds.username, $scope.creds.password, 'jsonfile')
             .then(
             onLoginComplete,
             function(error){
@@ -61,6 +75,7 @@ app.controller('HelloWorldCtrl', function ($scope, percero) {
              */
             var example = new percero.domain.User();
             example.userId = userToken.user.ID;
+            console.log("UserID: "+userToken.user.ID);
             percero.api.findByExample(example, function(message) {
                 console.log(message);
                 $scope.user = message.result[0];

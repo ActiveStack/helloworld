@@ -66,6 +66,77 @@ angular.module('Percero.Api', ['Percero.Model','Percero.Client','Percero.Config'
                 return deferred.promise;
             };
 
+            this.authenticateWithUserPass = function(username,password,providerId){
+                var deferred = Q.defer();
+
+                this.connect()
+                    .then(function () {
+                        $log.info("Client connected");
+                        self.loginWithUserPass(username, password, providerId)
+                            .then(
+                            function (success) {
+                                deferred.resolve(success);
+                            },
+                            function (error) {
+                                deferred.reject(error);
+                            });
+                    }, function (error) {
+                        deferred.reject(error);
+                    });
+
+                return deferred.promise;
+            };
+
+            this.loginWithUserPass = function(username, password, providerId){
+                console.log("LoginWithUserPass called");
+                var deferred = loginDeferred = Q.defer();
+                loginTimeout = setTimeout(function(){
+                    if(loginDeferred) {
+                        loginDeferred.reject(new Error("Login Timed Out"));
+                        loginDeferred = null;
+                        loginUT = null;
+                        loginTimeout = null;
+                    }
+                },45000);
+                var request = {};
+                request.cn = "com.percero.agents.auth.vo.AuthenticationRequest";
+                request.deviceId = deviceId;
+                request.authProvider = providerId;
+                request.credential = username+":"+password;
+
+                $log.info('Senging AuthenticationRequest');
+                client.sendRequest("authenticate", request, function(message) {
+                    console.log("Got authenticate response");
+                    if(deferred) {
+                        deferred.notify(1);
+                    }
+
+                    // Store the userToken in the cookie for later
+                    $log.info('authenticateOAuthCode message:');
+                    $log.info(message);
+                    if(message.result) {
+                        userToken = message.result;
+
+                        $log.info('Saving userToken as cookie');
+                        self.setCookie('userToken', userToken);
+                        /**
+                         * TODO: This only seems to break things? Is this really needed?
+                         */
+                        client.setCommonParams({token: message.result.token,
+                            userId: message.result.user.ID,
+                            deviceId: message.result.deviceId,
+                            sendAck: true});
+
+
+                        loginUT = userToken;
+                    }
+                    else
+                        deferred.resolve(false);
+                });
+
+                return deferred.promise;
+            };
+
             this.authenticateAnonymously = function(){
                 var deferred = Q.defer();
 
@@ -157,7 +228,7 @@ angular.module('Percero.Api', ['Percero.Model','Percero.Client','Percero.Config'
                 this.currentOauthProvider = oauthProvider;
                 this.currentOauthProviderId = providerId;
 
-                if (providerId.toUpperCase() == "GOOGLE") {
+                if (providerId.toUpperCase() == "GOOGLEOAUTH" || providerId.toUpperCase() == "GOOGLE") {
                     var uri = "https://accounts.google.com/o/oauth2/auth?client_id="
                         + oauthProvider.appKey + "&access_type=offline&redirect_uri="
                         + oauthProvider.redirectUri + "&response_type=code&" +
@@ -244,12 +315,10 @@ angular.module('Percero.Api', ['Percero.Model','Percero.Client','Percero.Config'
                 },45000);
                 var request = {};
                 request.cn = "com.percero.agents.auth.vo.AuthenticationRequest";
-                request.regAppKey = "";
                 request.credential = JSON.stringify({
                     code: oauthCode,
                     redirectUrl: this.currentOauthProvider.redirectUri
                     });
-                request.deviceId = deviceId;
                 request.authProvider = this.currentOauthProviderId;
                 $log.info('Senging authenticateOAuthCode request');
                 client.sendRequest("authenticate", request, function(message) {
