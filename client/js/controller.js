@@ -6,42 +6,86 @@ app.controller('HelloWorldCtrl', function ($scope, percero) {
     $scope.authenticated = false;
     $scope.percero = percero;
 
-    $scope.login = function(){
-        percero.api.authenticate('Google')
+    $scope.anonLogin = function(){
+        percero.api.authenticateAnonymously()
             .then(
-            function(userToken){
-                console.log("onLoginResult");
-                if(!userToken){
-                    console.log("token falsey")
-                }else{
-                    /**
-                     * Successful auth... now pull down the person object so
-                     * we know who we are
-                     */
-                    console.log("OAuth Success!")
-                    $scope.authenticated = true;
-
-                    /**
-                     * Now do a lookup for our user object
-                     */
-                    var example = new percero.domain.User();
-                    example.userId = userToken.user.ID;
-                    percero.api.findByExample(example, function(message) {
-                        var user = message.result[0];
-                        $scope.$apply(function(){
-                            // This also gets hit when the server sends down a person object
-                            $scope.user = user;
-                            console.log(user);
-                        });
-                    });
-                }
-            },
+            onLoginComplete,
             function(error){
                 console.log(error);
             },
             function(progress) {
                 console.log(progress);
             });
+    };
+
+    $scope.cookieLogin = function(){
+        percero.api.authenticateFromCookie()
+            .then(
+            onLoginComplete,
+            function(error){
+                console.log(error);
+            },
+            function(progress) {
+                console.log(progress);
+            });
+
+    };
+
+    $scope.googleLogin = function(){
+        percero.api.authenticateWithOAuth('googleoauth')
+            .then(
+            onLoginComplete,
+            function(error){
+                console.log(error);
+            },
+            function(progress) {
+                console.log(progress);
+            });
+
+    };
+
+    $scope.creds = {}
+    $scope.userPassLogin = function(){
+        percero.api.authenticateWithUserPass($scope.creds.username, $scope.creds.password, 'jsonfile')
+            .then(
+            onLoginComplete,
+            function(error){
+                console.log(error);
+            },
+            function(progress) {
+                console.log(progress);
+            });
+
+    };
+
+    function onLoginComplete(userToken){
+        console.log("onLoginResult");
+        if(!userToken){
+            console.log("token falsey")
+        }else{
+            /**
+             * Successful auth... now pull down the person object so
+             * we know who we are
+             */
+            console.log("Auth Success!")
+            $scope.authenticated = true;
+
+            /**
+             * Now do a lookup for our user object
+             */
+            var example = new percero.domain.User();
+            example.userId = userToken.user.ID;
+            console.log("UserID: "+userToken.user.ID);
+            percero.api.findByExample(example, function(message) {
+                console.log(message);
+                $scope.user = message.result[0];
+                //$scope.$apply(function(){
+                //    // This also gets hit when the server sends down a person object
+                //    $scope.user = user;
+                //    console.log(user);
+                //});
+            });
+        }
     }
 
     $scope.percero = percero;

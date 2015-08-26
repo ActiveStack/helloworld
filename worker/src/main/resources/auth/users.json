@@ -1,0 +1,14 @@
+[
+  {
+    "firstName":"Jonathan",
+    "lastName":"Samples",
+    "email":"jonathan@mail.com",
+    "passHash":"3da541559918a808c2402bba5012f6c60b27661c"
+  },
+  {
+    "firstName":"Collin",
+    "lastName":"Brown",
+    "email":"collin@mail.com",
+    "passHash":"1161e6ffd3637b302a5cd74076283a7bd1fc20d3"
+  }
+]

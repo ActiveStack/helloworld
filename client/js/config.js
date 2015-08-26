@@ -6,7 +6,7 @@ angular.module('Percero.Config', [], function($provide) {
           gatewayPort: "8080",
           // The OAuth provider used for authentication
           oauthProviders: {
-            "Google": {
+            "googleoauth": {
               redirectUri: "http://localhost:8081/oauth2callback.html",
               appKey: "426306336879-m3ffk6mqt63pot5pg1kq52b7rmf2lnfo.apps.googleusercontent.com",
               displayName: "Google"
