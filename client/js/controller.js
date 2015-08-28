@@ -46,7 +46,7 @@ app.controller('HelloWorldCtrl', function ($scope, percero) {
 
     $scope.creds = {}
     $scope.userPassLogin = function(){
-        percero.api.authenticateWithUserPass($scope.creds.username, $scope.creds.password, 'jsonfile')
+        percero.api.authenticateWithUserPass($scope.creds.username, $scope.creds.password, 'pulse_http')
             .then(
             onLoginComplete,
             function(error){

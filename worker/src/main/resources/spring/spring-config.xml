@@ -10,5 +10,6 @@
 	<!-- Component Packages to scan -->
 	<context:component-scan base-package="io.activestack.helloworld.auth.helpers" />
 	<context:component-scan base-package="io.activestack.helloworld.model" />
+	<context:component-scan base-package="com.convergys.pulse.service" />
 
 </beans>
