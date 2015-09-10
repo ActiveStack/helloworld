@@ -58,6 +58,11 @@ app.controller('HelloWorldCtrl', function ($scope, percero) {
 
     };
 
+    $scope.logout = function(){
+        percero.api.logout();
+        $scope.authenticated = false;
+    }
+
     function onLoginComplete(userToken){
         console.log("onLoginResult");
         if(!userToken){

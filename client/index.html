@@ -20,7 +20,7 @@
         <button ng-click="userPassLogin()">U/P Login</button>
     </div>
     <div ng-if="authenticated">
-        <p>User: {{ user.firstName }} {{ user.lastName }}</p>
+        <p>User: {{ user.firstName }} {{ user.lastName }} <button ng-click="logout()">Logout</button></p>
         <button ng-click="addBlock()">Add Block</button>
         <div>
             <div ng-repeat="block in percero.domain.Block.prototype.all"
