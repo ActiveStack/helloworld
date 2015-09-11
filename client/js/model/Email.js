@@ -165,7 +165,7 @@ angular.module('HelloWorld.Domain.Email',
                         o.dateCreated = this.dateCreated;
                         o.dateModified = this.dateModified;
                         o.value = this.value;
-                        o.person = this.person != null ? this.person.toClassPair() : null;
+                        o.Person = this.person != null ? this.person.toClassPair() : null;
                         return o;
                     },
 

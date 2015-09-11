@@ -1,10 +1,10 @@
-angular.module('HelloWorld.Domain.User',
+angular.module('HelloWorld.Domain.Person',
     [],
     function($provide) {
-    $provide.factory('User',
+    $provide.factory('Person',
             function($log)
         {
-    var User = Class.extend
+    var Person = Class.extend
     ({
         construct: function(){
             var self = this;
@@ -14,14 +14,16 @@ angular.module('HelloWorld.Domain.User',
             var isShell = true;
             var isValid = true;
             var isLoading = false;
-            var cn = "io.activestack.helloworld.model.User";
+            var cn = "io.activestack.helloworld.model.Person";
             var dateCreated;
             var dateModified;
             var userId;
             var firstName;
             var lastName;
             var nickName;
-            var userRoles = []; // UserRole
+            var personRoles = []; // PersonRole
+            var emails = []; // Email
+            var circles = []; // Circle
 
             Object.defineProperty(this, "isProxy", {
                 get: function() {
@@ -140,26 +142,58 @@ angular.module('HelloWorld.Domain.User',
             });
 
         /** Target Relationships **/
-            Object.defineProperty(this, "userRoles", { // UserRole
+            Object.defineProperty(this, "personRoles", { // PersonRole
                 get: function() {
                     this.doLoad();
-                    return userRoles;
+                    return personRoles;
                 },
                 set: function(val) {
-                    userRoles = val;
+                    personRoles = val;
+                },
+                enumerable: true
+            });
+
+            Object.defineProperty(this, "emails", { // PersonRole
+                get: function() {
+                    this.doLoad();
+                    return emails;
+                },
+                set: function(val) {
+                    emails = val;
+                },
+                enumerable: true
+            });
+
+            Object.defineProperty(this, "circles", { // Circle
+                get: function() {
+                    this.doLoad();
+                    return circles;
+                },
+                set: function(val) {
+                    circles = val;
                 },
                 enumerable: true
             });
         },
         removeReferences: function() {
-                for (var i = this.userRoles.length - 1; i >=0; i--) {
-                    var o = this.user[i];
-                    o.user = null;
-                }
+            for (var i = this.personRoles.length - 1; i >=0; i--) {
+                var o = this.personRoles[i];
+                o.person = null;
+            }
+
+            for (var i = this.emails.length - 1; i >=0; i--) {
+                var o = this.emails[i];
+                o.person = null;
+            }
+
+            for (var i = this.circles.length - 1; i >=0; i--) {
+                var o = this.circles[i];
+                o.person = null;
+            }
         },
 
         toClassPair: function() {
-            return {ID: this.ID, className: this.cn};
+            return {ID: this.ID, cn: this.cn};
         },
 
         toObject: function() {
@@ -171,10 +205,20 @@ angular.module('HelloWorld.Domain.User',
             o.userId = this.userId;
             o.firstName = this.firstName;
             o.lastName = this.lastName;
-            o.userRoles = [];
-            for (var i = 0; i < this.userRoles.length; i++) {
-                var entity = this.userRoles[i];
-                o.userRoles.push(entity.toClassPair());
+            o.personRoles = [];
+            for (var i = 0; i < this.personRoles.length; i++) {
+                var entity = this.personRoles[i];
+                o.personRoles.push(entity.toClassPair());
+            }
+            o.emails = [];
+            for (var i = 0; i < this.emails.length; i++) {
+                var entity = this.emails[i];
+                o.emails.push(entity.toClassPair());
+            }
+            o.circles = [];
+            for (var i = 0; i < this.circles.length; i++) {
+                var entity = this.circles[i];
+                o.circles.push(entity.toClassPair());
             }
             return o;
         },
@@ -203,25 +247,25 @@ angular.module('HelloWorld.Domain.User',
     });
 
     // Define static variables and functions
-    User.prototype._all = [];
-    User.prototype._allIsLoaded = false;
+    Person.prototype._all = [];
+    Person.prototype._allIsLoaded = false;
 
-    Object.defineProperty(User.prototype, "all", {
+    Object.defineProperty(Person.prototype, "all", {
         get: function() {
-            if(!User.prototype._allIsLoaded){
-                User.prototype._allIsLoaded = true;
-                this.api.getAllByName("io.activestack.helloworld.model.User", function(result){
+            if(!Person.prototype._allIsLoaded){
+                Person.prototype._allIsLoaded = true;
+                this.api.getAllByName("io.activestack.helloworld.model.Person", function(result){
                     // Do nothing
                 });
             }
 
-            return User.prototype._all;
+            return Person.prototype._all;
         },
 
         enumerable: true
     });
 
-return User;
+return Person;
     });
 });
 

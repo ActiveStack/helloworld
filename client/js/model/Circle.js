@@ -1,10 +1,10 @@
-angular.module('HelloWorld.Domain.Block',
+angular.module('HelloWorld.Domain.Circle',
     [],
     function($provide) {
-        $provide.factory('Block',
+        $provide.factory('Circle',
             function($log)
             {
-                var Block = Class.extend
+                var Circle = Class.extend
                 ({
                     construct: function(){
                         var self = this;
@@ -14,8 +14,9 @@ angular.module('HelloWorld.Domain.Block',
                         var isShell = true;
                         var isValid = true;
                         var isLoading = false;
-                        var cn = "io.activestack.helloworld.model.Block";
+                        var cn = "io.activestack.helloworld.model.Circle";
                         var color;
+                        var person; // Person
 
                         Object.defineProperty(this, "isProxy", {
                             get: function() {
@@ -89,9 +90,41 @@ angular.module('HelloWorld.Domain.Block',
                             enumerable: true
                         });
 
+                        /** Source Relationships **/
+                        Object.defineProperty(this, "person", {  // Person
+                            get: function() {
+                                this.doLoad();
+                                return person;
+                            },
+                            set: function(val) {
+                                if (!this.isProxy) {
+                                    if (val != null && !val.isShell) {
+                                        var existing = false;
+                                        for (var i = 0; i < val.circles.length; i++) {
+                                            var object = val.circles[i];
+                                            if (object === self) {
+                                                existing = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!existing) val.circles.push(self);
+                                    } else if (person != null) {
+                                        for (var i = 0; i < person.circles.length; i++) {
+                                            var object = person.circles[i];
+                                            if (object === self) {
+                                                person.circles.splice(i, 1);
+                                            }
+                                        }
+                                    }
+                                }
+                                person = val;
+                            },
+                            enumerable: true
+                        });
+
                     },
                     removeReferences: function() {
-
+                        this.person = null;
                     },
 
                     toClassPair: function() {
@@ -103,6 +136,8 @@ angular.module('HelloWorld.Domain.Block',
                         o.ID = this.ID;
                         o.cn= this.cn;
                         o.color = this.color;
+                        o.person = this.person != null ? this.person.toClassPair() : null;
+
                         return o;
                     },
 
@@ -130,24 +165,24 @@ angular.module('HelloWorld.Domain.Block',
                 });
 
                 // Define static variables and functions
-                Block.prototype._all = [];
-                Block.prototype._allIsLoaded = false;
+                Circle.prototype._all = [];
+                Circle.prototype._allIsLoaded = false;
 
-                Object.defineProperty(Block.prototype, "all", {
+                Object.defineProperty(Circle.prototype, "all", {
                     get: function() {
-                        if(!Block.prototype._allIsLoaded){
-                            Block.prototype._allIsLoaded = true;
-                            this.api.getAllByName("io.activestack.helloworld.model.Block", function(result){
+                        if(!Circle.prototype._allIsLoaded){
+                            Circle.prototype._allIsLoaded = true;
+                            this.api.getAllByName("io.activestack.helloworld.model.Circle", function(result){
                             });
                         }
 
-                        return Block.prototype._all;
+                        return Circle.prototype._all;
                     },
 
                     enumerable: true
                 });
 
-                return Block;
+                return Circle;
             });
     });
 

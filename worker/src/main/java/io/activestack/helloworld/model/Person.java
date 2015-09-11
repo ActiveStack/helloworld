@@ -19,9 +19,9 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-//@NamedQueries({@NamedQuery(name="updateQuery", query="jpql:SELECT COUNT(DISTINCT u) FROM User u WHERE u.userId=:userId")})
+//@NamedQueries({@NamedQuery(name="updateQuery", query="jpql:SELECT COUNT(DISTINCT u) FROM Person u WHERE u.userId=:userId")})
 @EntityInterface(interfaceClass=IUserAnchor.class)
-public class User extends BaseDataObject implements Serializable, IUserAnchor
+public class Person extends BaseDataObject implements Serializable, IUserAnchor
 {
     //////////////////////////////////////////////////////
     // VERSION
@@ -106,13 +106,33 @@ public class User extends BaseDataObject implements Serializable, IUserAnchor
     }
 
     @Externalize
-    @OneToMany(fetch=FetchType.LAZY, targetEntity=UserRole.class, mappedBy="user", cascade=javax.persistence.CascadeType.REMOVE)
-    private List<UserRole> userRoles;
-    public List<UserRole> getUserRoles() {
-        return this.userRoles;
+    @OneToMany(fetch=FetchType.LAZY, targetEntity=PersonRole.class, mappedBy="person", cascade=javax.persistence.CascadeType.REMOVE)
+    private List<PersonRole> personRoles;
+    public List<PersonRole> getPersonRoles() {
+        return this.personRoles;
     }
-    public void setUserRoles(List<UserRole> value) {
-        this.userRoles = value;
+    public void setPersonRoles(List<PersonRole> value) {
+        this.personRoles = value;
+    }
+
+    @Externalize
+    @OneToMany(fetch=FetchType.LAZY, targetEntity=Email.class, mappedBy="person", cascade=javax.persistence.CascadeType.REMOVE)
+    private List<Email> emails;
+    public List<Email> getEmails() {
+        return this.emails;
+    }
+    public void setEmails(List<Email> value) {
+        this.emails = value;
+    }
+
+    @Externalize
+    @OneToMany(fetch=FetchType.LAZY, targetEntity=Circle.class, mappedBy="person", cascade=javax.persistence.CascadeType.REMOVE)
+    private List<Circle> circles;
+    public List<Circle> getCircles() {
+        return this.circles;
+    }
+    public void setCircles(List<Circle> value) {
+        this.circles = value;
     }
 
 
@@ -198,10 +218,10 @@ public class User extends BaseDataObject implements Serializable, IUserAnchor
             }
         }
 
-        objectJson += ",\"userRoles\":[";
-        if (getUserRoles() != null) {
+        objectJson += ",\"personRoles\":[";
+        if (getPersonRoles() != null) {
             int personRolesCounter = 0;
-            for(UserRole nextPersonRoles : getUserRoles()) {
+            for(PersonRole nextPersonRoles : getPersonRoles()) {
                 if (personRolesCounter > 0)
                     objectJson += ",";
                 try {
@@ -212,7 +232,38 @@ public class User extends BaseDataObject implements Serializable, IUserAnchor
                 }
             }
         }
+        objectJson += "]";
 
+        objectJson += ",\"emails\":[";
+        if (getEmails() != null) {
+            int emailsCounter = 0;
+            for(Email email : getEmails()) {
+                if (emailsCounter > 0)
+                    objectJson += ",";
+                try {
+                    objectJson += email.toEmbeddedJson();
+                    emailsCounter++;
+                } catch(Exception e) {
+                    // Do nothing.
+                }
+            }
+        }
+        objectJson += "]";
+
+        objectJson += ",\"circles\":[";
+        if (getCircles() != null) {
+            int circlesCounter = 0;
+            for(Circle circle : getCircles()) {
+                if (circlesCounter > 0)
+                    objectJson += ",";
+                try {
+                    objectJson += circle.toEmbeddedJson();
+                    circlesCounter++;
+                } catch(Exception e) {
+                    // Do nothing.
+                }
+            }
+        }
         objectJson += "]";
 
 
@@ -230,7 +281,10 @@ public class User extends BaseDataObject implements Serializable, IUserAnchor
         setFirstName(JsonUtils.getJsonString(jsonObject, "firstName"));
         setLastName(com.percero.serial.JsonUtils.getJsonString(jsonObject, "lastName"));
 
-        this.userRoles = (List<UserRole>) JsonUtils.getJsonListPerceroObject(jsonObject, "userRoles");
+        this.personRoles = (List<PersonRole>) JsonUtils.getJsonListPerceroObject(jsonObject, "personRoles");
+        this.emails = (List<Email>) JsonUtils.getJsonListPerceroObject(jsonObject, "emails");
+        this.circles = (List<Circle>) JsonUtils.getJsonListPerceroObject(jsonObject, "circles");
+
     }
 
 }

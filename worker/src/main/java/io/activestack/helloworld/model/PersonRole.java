@@ -20,7 +20,7 @@ import java.util.Date;
 
 @EntityInterface(interfaceClass=IUserRole.class)
 @Entity
-public class UserRole extends BaseDataObject implements Serializable, IUserRole
+public class PersonRole extends BaseDataObject implements Serializable, IUserRole
 {
     //////////////////////////////////////////////////////
     // VERSION
@@ -91,14 +91,14 @@ public class UserRole extends BaseDataObject implements Serializable, IUserRole
     @RelationshipInterface(entityInterfaceClass=IUserRole.class, sourceVarName="userAnchor")
     @Externalize
     @JoinColumn(name="person_ID")
-    @org.hibernate.annotations.ForeignKey(name="FK_User_user_TO_UserRole")
+    @org.hibernate.annotations.ForeignKey(name="FK_Person_person_TO_UserRole")
     @ManyToOne(fetch=FetchType.LAZY, optional=false)
-    private User user;
-    public User getUser() {
-        return this.user;
+    private Person person;
+    public Person getPerson() {
+        return this.person;
     }
-    public void setUser(User value) {
-        this.user = value;
+    public void setPerson(Person value) {
+        this.person = value;
     }
 
 
@@ -145,12 +145,12 @@ public class UserRole extends BaseDataObject implements Serializable, IUserRole
         }
 
         // Source Relationships
-        objectJson += ",\"user\":";
-        if (getUser() == null)
+        objectJson += ",\"person\":";
+        if (getPerson() == null)
             objectJson += "null";
         else {
             try {
-                objectJson += getUser().toEmbeddedJson();
+                objectJson += getPerson().toEmbeddedJson();
             } catch(Exception e) {
                 objectJson += "null";
             }
@@ -172,7 +172,7 @@ public class UserRole extends BaseDataObject implements Serializable, IUserRole
         setRoleName(JsonUtils.getJsonString(jsonObject, "roleName"));
 
         // Source Relationships
-        this.user = JsonUtils.getJsonPerceroObject(jsonObject, "user");
+        this.person = JsonUtils.getJsonPerceroObject(jsonObject, "person");
 
         // Target Relationships
     }

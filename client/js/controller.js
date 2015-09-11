@@ -61,6 +61,7 @@ app.controller('HelloWorldCtrl', function ($scope, percero) {
     $scope.logout = function(){
         percero.api.logout();
         $scope.authenticated = false;
+        delete $scope.person
     }
 
     function onLoginComplete(userToken){
@@ -78,17 +79,12 @@ app.controller('HelloWorldCtrl', function ($scope, percero) {
             /**
              * Now do a lookup for our user object
              */
-            var example = new percero.domain.User();
+            var example = new percero.domain.Person();
             example.userId = userToken.user.ID;
             console.log("UserID: "+userToken.user.ID);
             percero.api.findByExample(example, function(message) {
                 console.log(message);
-                $scope.user = message.result[0];
-                //$scope.$apply(function(){
-                //    // This also gets hit when the server sends down a person object
-                //    $scope.user = user;
-                //    console.log(user);
-                //});
+                $scope.person = message.result[0];
             });
         }
     }
@@ -107,13 +103,20 @@ app.controller('HelloWorldCtrl', function ($scope, percero) {
         block.save();
     }
 
-    $scope.changeColor = function(block){
-        block.color = getRandomColor();
-        block.save();
+    $scope.changeColor = function(obj){
+        obj.color = getRandomColor();
+        obj.save();
     }
 
     $scope.removeBlock = function(block){
         block.remove();
+    }
+
+    $scope.addCircle = function(){
+        var circle = new percero.domain.Circle();
+        circle.person = $scope.person;
+        circle.color = getRandomColor();
+        circle.save();
     }
 
 

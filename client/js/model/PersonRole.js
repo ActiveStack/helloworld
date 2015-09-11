@@ -1,10 +1,10 @@
-angular.module('HelloWorld.Domain.UserRole',
+angular.module('HelloWorld.Domain.PersonRole',
     [],
     function($provide) {
-    $provide.factory('UserRole', 
+    $provide.factory('PersonRole',
             function($log)
         {
-    var UserRole = Class.extend
+    var PersonRole = Class.extend
     ({
         construct: function(){
             var self = this;
@@ -14,11 +14,11 @@ angular.module('HelloWorld.Domain.UserRole',
             var isShell = true;
             var isValid = true;
             var isLoading = false;
-            var cn = "io.activestack.helloworld.model.UserRole";
+            var cn = "io.activestack.helloworld.model.PersonRole";
             var dateCreated;
             var dateModified;
             var roleName;
-            var user; // User
+            var person; // Person
             
             Object.defineProperty(this, "isProxy", {
                 get: function() {
@@ -118,40 +118,40 @@ angular.module('HelloWorld.Domain.UserRole',
         /** Target Relationships **/
 
         /** Source Relationships **/
-            Object.defineProperty(this, "user", {  // User
+            Object.defineProperty(this, "person", {  // Person
                 get: function() {
                     this.doLoad();
-                    return user;
+                    return person;
                 },
                 set: function(val) {
                     if (!this.isProxy) {
                         if (val != null && !val.isShell) {
                             var existing = false;
-                            for (var i = 0; i < val.userRoles.length; i++) {
-                                var object = val.userRoles[i];
+                            for (var i = 0; i < val.personRoles.length; i++) {
+                                var object = val.personRoles[i];
                                 if (object === self) {
                                     existing = true;
                                     break;
                                 }
                             }
-                            if (!existing) val.userRoles.push(self);
-                        } else if (user != null) {
-                            for (var i = 0; i < user.userRoles.length; i++) {
-                                var object = user.userRoles[i];
+                            if (!existing) val.personRoles.push(self);
+                        } else if (person != null) {
+                            for (var i = 0; i < person.personRoles.length; i++) {
+                                var object = person.personRoles[i];
                                 if (object === self) {
-                                    user.userRoles.splice(i, 1);
+                                    person.personRoles.splice(i, 1);
                                 }
                             }
                         }
                     }
-                    user = val;
+                    person = val;
                 },
                 enumerable: true
             });
     
         },
         removeReferences: function() {
-                this.user = null;
+                this.person = null;
         },
         
         toClassPair: function() {
@@ -165,7 +165,7 @@ angular.module('HelloWorld.Domain.UserRole',
             o.dateCreated = this.dateCreated;
             o.dateModified = this.dateModified;
             o.roleName = this.roleName;
-            o.user = this.user != null ? this.user.toClassPair() : null;
+            o.person = this.person != null ? this.person.toClassPair() : null;
             return o;
         },
         
@@ -193,25 +193,25 @@ angular.module('HelloWorld.Domain.UserRole',
     });
     
     // Define static variables and functions
-    UserRole.prototype._all = [];
-    UserRole.prototype._allIsLoaded = false;
+    PersonRole.prototype._all = [];
+    PersonRole.prototype._allIsLoaded = false;
 
-    Object.defineProperty(UserRole.prototype, "all", {
+    Object.defineProperty(PersonRole.prototype, "all", {
         get: function() {
-            if(!UserRole.prototype._allIsLoaded){
-                UserRole.prototype._allIsLoaded = true;
-                this.api.getAllByName("io.activestack.helloworld.model.UserRole", function(result){
+            if(!PersonRole.prototype._allIsLoaded){
+                PersonRole.prototype._allIsLoaded = true;
+                this.api.getAllByName("io.activestack.helloworld.model.PersonRole", function(result){
                     // Do nothing
                 });
             }
                 
-            return UserRole.prototype._all;
+            return PersonRole.prototype._all;
         },
 
         enumerable: true
     });
         
-return UserRole;
+return PersonRole;
     });
 });
 

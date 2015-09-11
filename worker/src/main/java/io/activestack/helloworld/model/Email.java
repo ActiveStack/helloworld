@@ -96,15 +96,15 @@ public class Email extends BaseDataObject implements Serializable, IUserIdentifi
     @Externalize
     @JsonSerialize(using=BDOSerializer.class)
     @JsonDeserialize(using=BDODeserializer.class)
-    @JoinColumn(name="user_ID")
-    @org.hibernate.annotations.ForeignKey(name="FK_User_user_TO_Email")
+    @JoinColumn(name="person_ID")
+    @org.hibernate.annotations.ForeignKey(name="FK_Person_person_TO_Email")
     @ManyToOne(fetch=FetchType.LAZY, optional=false)
-    private User user;
-    public User getUser() {
-        return this.user;
+    private Person person;
+    public Person getPerson() {
+        return this.person;
     }
-    public void setUser(User value) {
-        this.user = value;
+    public void setPerson(Person value) {
+        this.person = value;
     }
 
     //////////////////////////////////////////////////////
@@ -156,12 +156,12 @@ public class Email extends BaseDataObject implements Serializable, IUserIdentifi
         }
 
         // Source Relationships
-        objectJson += ",\"user\":";
-        if (getUser() == null)
+        objectJson += ",\"person\":";
+        if (getPerson() == null)
             objectJson += "null";
         else {
             try {
-                objectJson += ((BaseDataObject) getUser()).toEmbeddedJson();
+                objectJson += getPerson().toEmbeddedJson();
             } catch(Exception e) {
                 objectJson += "null";
             }
@@ -183,7 +183,7 @@ public class Email extends BaseDataObject implements Serializable, IUserIdentifi
         setValue(JsonUtils.getJsonString(jsonObject, "value"));
 
         // Source Relationships
-        this.user = JsonUtils.getJsonPerceroObject(jsonObject, "user");
+        this.person = JsonUtils.getJsonPerceroObject(jsonObject, "person");
 
         // Target Relationships
     }
